@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>json place holder API Challenge</title>
+</head>
+<style>
+    h1,h2,h3,h4,h5,h6{
+        margin: 0;
+    }
+    #user{
+        background-color: white;
+        border-radius: 100px;
+        padding: 10px;
+        font-size: 20px;
+        padding-left: 20px;
+        box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+        cursor: pointer;
+        margin-top: 15px;
+    }
+    #user.selected{
+        border: solid #ff6200 6px;
+    }
+    #post {
+        background-color: white;
+        border-radius: 10px;
+        font-size: 20px;
+        padding: 10px;
+        margin-top: 10px;
+        box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+
+        
+    }
+    body{
+        background: linear-gradient(45deg, rgb(16, 16, 129),rgb(98, 10, 10));
+    }
+</style>
+<body>
+    <!-- main div -->
+     <div style="display: flex;">
+        <!-- Slider div -->
+         <div style="width: 30%;">
+            <!-- Users Centners -->
+             <div id="users" style="width: 90% ; height: 100px; margin:  0 auto;">
+                <!-- User -->
+                 <div id="user" class="selected" onclick="getAllPosts()">
+                    <h3 style="text-align: center;">كل البوستات</h3>
+                    <!-- <h3></h3> -->
+                 </div>
+             </div>
+         </div>
+         <!-- Posts Content -->
+         <div id="posts-continer" style="width: 70%; background-color: rgb(236, 236, 236); padding: 20px 0 ; border-radius: 15px;">
+             <!-- Posts -->
+            <div id="posts" style="width: 90%; margin: 0 auto;">
+                <!-- Post -->
+                <div id="post">
+                    <h3>Ahmed</h3>
+                    <h4>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsam sint, quam nobis eius inventore excepturi? Ullam similique magnam, hic doloribus saepe nobis suscipit vel blanditiis? Vero enim sapiente excepturi. Tempora?</h4>
+                 </div>
+            </div>
+         </div>
+     </div>
+</body>
+<script>
+    
+    function getAllPosts(){
+        let request = new XMLHttpRequest();
+        request.open('GET', 'https://jsonplaceholder.typicode.com/posts');
+        request.responseType = "json"
+        request.send();
+        request.onload = function() {
+            if(request.status >= 200 && request.status < 300) {
+                let posts = request.response;
+                document.getElementById("posts").innerHTML = ""
+                for(post of posts){
+                    let content = ` 
+                        <div id="post">
+                            <h3>${post.title}</h3>
+                            <hr>
+                            <h4>${post.body}</h4>
+                        </div>`
+                    document.getElementById("posts").innerHTML += content
+                }
+            }
+            else {
+                alert('Error: ', request.status);
+            }
+        }
+    }
+
+    function getUsers(){
+        let request = new XMLHttpRequest();
+        request.open('GET', 'https://jsonplaceholder.typicode.com/users');
+        request.responseType = "json"
+        request.send();
+        request.onload = function() {
+            if(request.status >= 200 && request.status < 300) {
+                let users = request.response;
+                // document.getElementById("users").innerHTML = ""
+                let index = 0
+                for(user of users){
+                    let content = ` 
+                    <div id="user" onclick="userPosts(${user.id}, this)" class="">
+                        <h3>${user.name}</h3>
+                        <h3>${user.email}</h3>
+                    </div>
+                    `
+                    document.getElementById("users").innerHTML += content
+                    index++
+                }
+            console.log(users)
+            }
+            else {
+                alert('Error: ', request.status);
+            }
+        }
+    }
+
+    function userPosts(id , el){
+        let request = new XMLHttpRequest();
+        request.open('GET', `https://jsonplaceholder.typicode.com/posts?userId=${id}`);
+        request.responseType = "json"
+        request.send();
+        request.onload = function() {
+            if(request.status >= 200 && request.status < 300) {
+                let posts = request.response;
+                document.getElementById("posts").innerHTML = ""
+                for(post of posts){
+                    let content = ` 
+                        <div id="post">
+                            <h3>${post.title}</h3>
+                            <hr>
+                            <h4>${post.body}</h4>
+                        </div>
+                    `
+                    document.getElementById("posts").innerHTML += content
+                  
+                }
+                console.log(posts)
+            }
+            else {
+                alert('Error: ', request.status);
+            }
+        }
+        let elements = document.getElementsByClassName('selected')
+        for(elem of elements){
+            elem.classList.remove('selected')
+        }
+        el.classList.add('selected')
+    }
+
+    getUsers()
+    getAllPosts(); // Call the function to fetch all posts
+    // getSpecificPosts(2)
+</script>
+</html>
